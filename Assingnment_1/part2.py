@@ -7,17 +7,27 @@ df_train = pd.read_csv("./part2/hepatitis-training", delimiter=r"\s+");
 df_test = pd.read_csv("./part2/hepatitis-test", delimiter=r"\s+");
 
 class Node:
-    def __init__(self, attribute, depth, probability = None, left_node = None, right_node = None, is_leaf = False, node_class = None):
+    def __init__(self, attribute, depth, probability = None, left_node = None, right_node = None, class_node=None):
         self.attribute = attribute
         self.left_node = left_node
         self.right_node = right_node 
-        self.is_leaf = is_leaf
         self.depth = depth   
         self.probability = probability
-        self.node_class = node_class
+        self.class_node = class_node
 
 def get_prob(data):
-    return data.Class.value_counts().die + data.Class.value_counts().live / len(data)
+
+    try:
+        die = data.Class.value_counts().die
+    except:
+        die = 0
+
+    try:
+        live = data.Class.value_counts().live
+    except:
+        live = 0
+
+    return  "die" if die > live else "live" , (die + live) / len(data)    
 
 
 def build_tree(instances, attributes, depth):
@@ -26,11 +36,21 @@ def build_tree(instances, attributes, depth):
     depth += 1
 
     if len(instances) == 0:
-        return Node("Leaf", depth, is_leaf=True, node_class="live", probability=get_prob(df_train))
+
+        #Create a leaf node using the most probable class
+        class_val, prob = get_prob(df_train)
+        return Node("Class", depth, probability=prob, class_node=class_val)
+        
     elif calc_impurity(instances, len(instances)) == 0:
-        return Node("Leaf", depth, is_leaf=True, node_class="live")
+
+        #Return a pure node
+        class_val, prob = get_prob(instances)
+        return Node("Class", depth, probability=prob, class_node=class_val)
+
     elif len(attributes) == 1:
-        return Node("Leaf", depth, is_leaf=True, node_class="live")
+        #Return a leaf with amjority class
+        class_val, prob = get_prob(instances)
+        return Node("Class", depth, probability=prob, class_node=class_val)
     else:
 
         best_impurity = sys.maxsize
@@ -65,7 +85,10 @@ def build_tree(instances, attributes, depth):
         left = build_tree(best_true, attributes, depth)
         right = build_tree(best_false, attributes, depth)
 
-        return Node(best_att, depth, left, right)
+        return Node(best_att, depth, left_node=left, right_node=right)
+    
+
+
     
 
 def calc_impurity(instances, total):
@@ -89,8 +112,8 @@ root_node = build_tree(df_train, list(df_train.columns.values), 0)
 #Print Tree
 def print_tree(node):
 
-    if(node.is_leaf):
-        print(f"Class  prop = {node.probability}")
+    if(node.class_node != None):
+        print(f"Class {node.class_node} prob = {node.probability}")
         return
 
     left = node.left_node
