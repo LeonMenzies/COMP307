@@ -6,11 +6,17 @@ import sys
 df_train = pd.read_csv("./part2/hepatitis-training", delimiter=r"\s+");
 df_test = pd.read_csv("./part2/hepatitis-test", delimiter=r"\s+");
 
+y = df_test.drop('Class', axis=1)
+y_class = df_test.Class
+
+# y = df_train.drop('Class', axis=1)
+# y_class = df_train.Class
+
 class Node:
-    def __init__(self, attribute, depth, probability = None, left_node = None, right_node = None, class_node=None):
+    def __init__(self, attribute, depth, probability = None, true_node = None, false_node = None, class_node=None):
         self.attribute = attribute
-        self.left_node = left_node
-        self.right_node = right_node 
+        self.true_node = true_node
+        self.false_node = false_node 
         self.depth = depth   
         self.probability = probability
         self.class_node = class_node
@@ -48,7 +54,7 @@ def build_tree(instances, attributes, depth):
         return Node("Class", depth, probability=prob, class_node=class_val)
 
     elif len(attributes) == 1:
-        #Return a leaf with amjority class
+        #Return a leaf with majority class
         class_val, prob = get_prob(instances)
         return Node("Class", depth, probability=prob, class_node=class_val)
     else:
@@ -82,10 +88,10 @@ def build_tree(instances, attributes, depth):
 
         attributes.remove(best_att)
 
-        left = build_tree(best_true, attributes, depth)
-        right = build_tree(best_false, attributes, depth)
+        true = build_tree(best_true, attributes, depth)
+        false = build_tree(best_false, attributes, depth)
 
-        return Node(best_att, depth, left_node=left, right_node=right)
+        return Node(best_att, depth, true_node=true, false_node=false)
     
 
 
@@ -113,17 +119,49 @@ root_node = build_tree(df_train, list(df_train.columns.values), 0)
 def print_tree(node):
 
     if(node.class_node != None):
-        print(f"Class {node.class_node} prob = {node.probability}")
+        print("   " * node.depth + f"Class {node.class_node} prob = {node.probability}")
         return
 
-    left = node.left_node
-    right = node.right_node
+    #print true
+    print("   " * node.depth + f"{node.attribute} = True")
+    print_tree(node.true_node)
 
-    if left != None:
-         print_tree(left)
-    if right != None:
-         print_tree(right)
+    #print false
+    print("   " * node.depth + f"{node.attribute} = False")
+    print_tree(node.false_node)
 
 
-   
 print_tree(root_node)
+
+results = []
+
+def test_tree(node, test):
+    
+    if node.class_node != None:
+        results.append(node.probability)
+        return
+    
+    if test[1][node.attribute] == True:
+        test_tree(node.true_node, test)
+    
+    if test[1][node.attribute] == False:
+        test_tree(node.false_node, test)
+    
+
+#test_tree(root_node, y[:1])
+
+
+
+for row in y.iterrows():
+    test_tree(root_node, row)
+
+print(results)
+
+correct = 0
+
+for i in range (len(results)):
+    if results[i] == y_class[i]:
+        correct += 1
+
+print(len(results) / len(y_class))
+print(correct / len(results))
