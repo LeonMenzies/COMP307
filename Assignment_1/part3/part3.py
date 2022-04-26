@@ -53,7 +53,7 @@ print("========================================")
 print("Spliting the data and running train test")
 print("========================================")
 
-df = pd.read_csv("./part3/ionosphere.data", delimiter=r"\s+");
+df = pd.read_csv(sys.argv[1], delimiter=r"\s+");
 
 #Add the dummy row for bias
 df.insert(0, "f0", 1)
