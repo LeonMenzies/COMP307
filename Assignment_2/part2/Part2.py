@@ -25,6 +25,9 @@ pset.addPrimitive(operator.add, 2)
 pset.addPrimitive(operator.sub, 2)
 pset.addPrimitive(operator.mul, 2)
 pset.addPrimitive(protectedDiv, 2)
+pset.addPrimitive(operator.neg, 1)
+pset.addPrimitive(math.cos, 1)
+pset.addPrimitive(math.sin, 1)
 
 
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
@@ -36,16 +39,13 @@ toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.ex
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("compile", gp.compile, pset=pset)
 
-def evalSymbReg(individual, points):
-    # Transform the tree expression in a callable function
+#My fitness function
+def fitnessFunc(individual, points):
     func = toolbox.compile(expr=individual)
+    error = ((func(x) - y)**2 for x, y in zip(points, y))
+    return math.fsum(error) / len(points),
 
-
-    sqerrors = ((func(x) - y)**2 for x, y in zip(points, y))
-    
-    return math.fsum(sqerrors) / len(points),
-
-toolbox.register("evaluate", evalSymbReg, points=x)
+toolbox.register("evaluate", fitnessFunc, points=x)
 
 toolbox.register("select", tools.selTournament, tournsize=3)
 toolbox.register("mate", gp.cxOnePoint)
@@ -56,7 +56,7 @@ toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_v
 toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
 
 def main():
-    random.seed(318)
+    random.seed(42)
 
     pop = toolbox.population(n=100)
     hof = tools.HallOfFame(1)

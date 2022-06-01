@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import MinMaxScaler
@@ -19,6 +20,7 @@ def encode_labels(labels):
     onehot_encoded = onehot_encoder.fit_transform(integer_encoded)
 
     return label_encoder, integer_encoded, onehot_encoder, onehot_encoded
+
 
 
 if __name__ == '__main__':
@@ -44,6 +46,7 @@ if __name__ == '__main__':
     initial_output_layer_weights = np.array([[-0.29, 0.03, 0.21], [0.08, 0.13, -0.36]])
     hidden_bias_values = np.array([-0.02, -0.20])
     output_bias_values = np.array([-0.33, 0.26, 0.06])
+
 
     nn = Neural_Network(n_in, n_hidden, n_out, initial_hidden_layer_weights, initial_output_layer_weights,
                         learning_rate, hidden_bias_values, output_bias_values)
@@ -86,3 +89,10 @@ if __name__ == '__main__':
 
     acc = np.sum(np.equal(integer_encoded.flatten(), test_prediction)) / len(test_prediction)
     print('acc = ', acc)
+
+   
+
+
+
+
+

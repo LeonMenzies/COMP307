@@ -1,7 +1,6 @@
 import numpy as np
 import math
 
-
 class Neural_Network:
     # Initialize the network
     def __init__(self, num_inputs, num_hidden, num_outputs, hidden_layer_weights, output_layer_weights, learning_rate, hidden_bias_values, output_bias_values):

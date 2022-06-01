@@ -40,7 +40,6 @@ toolbox.register("compile", gp.compile, pset=pset)
 def evalSymbReg(individual, points):
     # Transform the tree expression in a callable function
     func = toolbox.compile(expr=individual)
-    print(func(x))
     # Evaluate the mean squared error between the expression
     # and the real function : x**4 + x**3 + x**2 + x
     sqerrors = ((func(x) - x**4 - x**3 - x**2 - x)**2 for x in points)

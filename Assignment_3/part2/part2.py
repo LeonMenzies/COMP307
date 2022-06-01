@@ -1,5 +1,11 @@
 import pandas as pd
-data = pd.read_csv('part2/breast-cancer-training.csv')
+import sys
+# data = pd.read_csv('part2/breast-cancer-training.csv')
+# test_data = pd.read_csv('part2/breast-cancer-test.csv')
+
+#Load train and test data
+data = pd.read_csv(sys.argv[1], delimiter=r"\s+");
+test_data = pd.read_csv(sys.argv[2], delimiter=r"\s+");
 
 # Remove count row
 d = data.drop(data.columns[[0]], axis=1)
@@ -58,12 +64,10 @@ def naive_bayes(df):
 
     return prob
 
-#Load test dat
-test_data = pd.read_csv('part2/breast-cancer-test.csv')
+
 
 # Remove count row
 td = test_data.drop(test_data.columns[[0]], axis=1)
-
 
 
 
