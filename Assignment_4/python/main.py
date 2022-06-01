@@ -110,12 +110,15 @@ def savings_heuristic(px, py, demand, capacity, depot):
     """
 
     #Initilise routes except depot
-    routes = {}
+    routes = []
 
     for i in range(len(px)):
-        if i == depot:
-                continue
-        routes[i] = (depot, i, depot)
+        routes.append((depot, i, depot))
+
+    # for i in range(len(px)):
+    #     if i == depot:
+    #             continue
+    #     routes[i] = (depot, i, depot)
 
 
     #Compute the savings table
@@ -142,8 +145,18 @@ def savings_heuristic(px, py, demand, capacity, depot):
             if visited.__contains__(val):
                 continue
             
-            route1 = routes[val[0]]
-            route2 = routes[val[1]]
+            route1 = None
+            route2 = None
+
+            for route in routes:
+                if route.__contains__(val[0]):
+                    route1 = route
+                if route.__contains__(val[1]):
+                    route2 = route
+
+
+
+            #route1 = routes
 
             #Create the temp route
             new_route = [depot]
@@ -159,9 +172,11 @@ def savings_heuristic(px, py, demand, capacity, depot):
             #Check if the route is feasable
             if check_route(demand, new_route, capacity):
                 
-                del routes[val[1]]
-                routes[val[0]] = new_route
+                #del routes[val[1]]
+                #routes[val[0]] = new_route
                 # routes[val[1]] = new_route
+
+                routes.append(new_route)
 
 
                 #Remove from saving table
